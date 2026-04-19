@@ -1,0 +1,13 @@
+{
+  "host": "localhost",
+  "port": 3030,
+  "public": "./public/",
+  "origins": [
+    "http://localhost:3030"
+  ],
+  "paginate": {
+    "default": 10,
+    "max": 50
+  },
+  "mongodb": "mongodb+srv://esymons1055_db_user:<db_password>@symons-mongodb.9w7uzf3.mongodb.net/?appName=Symons-MongoDB"
+}

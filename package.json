@@ -1,27 +1,75 @@
 {
-    "name": "fi-ledger",
-    "version": "1.0.0",
-    "description": "This is a microservice for handling data from real finance providers (Capital One, Fidelity, etc.) to the Financial-Independence-Tracker App",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/KidlingYT/fi-ledger.git"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "type": "module",
-    "bugs": {
-        "url": "https://github.com/KidlingYT/fi-ledger/issues"
-    },
-    "homepage": "https://github.com/KidlingYT/fi-ledger#readme",
-    "dependencies": {
-        "express": "^5.2.1"
-    },
-    "devDependencies": {
-        "@types/express": "^5.0.6"
-    }
+  "name": "feathers-chat",
+  "description": "Fi-Ledger",
+  "version": "0.0.0",
+  "homepage": "",
+  "private": true,
+  "keywords": [
+    "feathers"
+  ],
+  "contributors": [],
+  "bugs": {},
+  "engines": {
+    "node": ">= 24.5.0"
+  },
+  "feathers": {
+    "language": "ts",
+    "packager": "npm",
+    "database": "mongodb",
+    "framework": "koa",
+    "transports": [
+      "rest",
+      "websockets"
+    ],
+    "schema": "typebox"
+  },
+  "directories": {
+    "lib": "src",
+    "test": "test"
+  },
+  "files": [
+    "lib/client.js",
+    "lib/**/*.d.ts",
+    "lib/**/*.shared.js"
+  ],
+  "main": "lib/client",
+  "scripts": {
+    "dev": "nodemon -x ts-node src/index.ts",
+    "compile": "shx rm -rf lib/ && tsc",
+    "start": "node lib/",
+    "prettier": "npx prettier \"**/*.ts\" --write",
+    "mocha": "cross-env NODE_ENV=test mocha test/ --require ts-node/register --recursive --extension .ts --exit",
+    "test": "npm run mocha",
+    "bundle:client": "npm run compile && npm pack --pack-destination ./public"
+  },
+  "dependencies": {
+    "@feathersjs/adapter-commons": "^5.0.44",
+    "@feathersjs/authentication": "^5.0.44",
+    "@feathersjs/authentication-client": "^5.0.44",
+    "@feathersjs/configuration": "^5.0.44",
+    "@feathersjs/errors": "^5.0.44",
+    "@feathersjs/feathers": "^5.0.44",
+    "@feathersjs/koa": "^5.0.44",
+    "@feathersjs/mongodb": "^5.0.44",
+    "@feathersjs/schema": "^5.0.44",
+    "@feathersjs/socketio": "^5.0.44",
+    "@feathersjs/transport-commons": "^5.0.44",
+    "@feathersjs/typebox": "^5.0.44",
+    "mongodb": "^6.19.0",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "@feathersjs/cli": "^5.0.44",
+    "@feathersjs/rest-client": "^5.0.44",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^25.5.0",
+    "axios": "^1.14.0",
+    "cross-env": "^10.1.0",
+    "mocha": "^11.7.5",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.8.3",
+    "shx": "^0.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
 }
