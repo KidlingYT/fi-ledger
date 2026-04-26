@@ -23,9 +23,9 @@ app.configure(configuration(configurationValidator))
 app.use(cors())
 app.use(errorHandler())
 app.use(parseAuthentication())
-// Middleware: intercept multipart uploads on POST /data
-// Extracts the CSV file content and merges it into the request body
 app.use(async (ctx, next) => {
+  // Middleware: intercept multipart uploads on POST /data
+  // Extracts the CSV file content and merges it into the request body
   if (ctx.method === 'POST' && ctx.path === '/data' && ctx.is('multipart/*')) {
     await upload.single('file')(ctx as any, async () => {})
     const file = (ctx as any).file as multer.File | undefined
@@ -38,6 +38,12 @@ app.use(async (ctx, next) => {
         data: csvString
       }
     }
+  }
+  // Healthcheck
+  if (ctx.path === '/health') {
+    ctx.status = 200
+    ctx.body = { status: 'ok' }
+    return
   }
   await next()
 })
