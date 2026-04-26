@@ -59,6 +59,7 @@
     "mongodb": "^6.19.0",
     "multer": "^2.1.1",
     "papaparse": "^5.5.3",
+    "rate-limiter-flexible": "^11.0.1",
     "winston": "^3.19.0"
   },
   "devDependencies": {

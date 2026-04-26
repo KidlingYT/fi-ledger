@@ -10,45 +10,18 @@ import { logError } from './hooks/log-error'
 import { mongodb } from './mongodb'
 import { services } from './services/index'
 import { channels } from './channels'
-import multer from '@koa/multer'
-
-const upload = multer({ storage: multer.memoryStorage() })
+import { middleware } from './middleware'
 
 const app: Application = koa(feathers())
 
-// Load our app configuration (see config/ folder)
 app.configure(configuration(configurationValidator))
 
-// Set up Koa middleware
-app.use(async (ctx, next) => {
-  if (ctx.path === '/health') {
-    ctx.status = 200
-    ctx.body = { status: 'ok' }
-    return
-  }
-  await next()
-})
+app.use(errorHandler()) // https://feathersjs.com/api/koa.html#errorhandler
+app.configure(middleware)
 app.use(cors())
-app.use(errorHandler())
 app.use(parseAuthentication())
-app.use(async (ctx, next) => {
-  if (ctx.method === 'POST' && ctx.path === '/data' && ctx.is('multipart/*')) {
-    await upload.single('file')(ctx as any, async () => {})
-    const file = (ctx as any).file as multer.File | undefined
-    if (file) {
-      const csvString = file.buffer.toString('utf-8')
-      ctx.request.body = {
-        ...(ctx.request.body as object),
-        dataType: 'File',
-        data: csvString
-      }
-    }
-  }
-  await next()
-})
 app.use(bodyParser())
 
-// Configure services and transports
 app.configure(rest())
 app.configure(
   socketio({
@@ -61,7 +34,6 @@ app.configure(mongodb)
 app.configure(services)
 app.configure(channels)
 
-// Register hooks that run on all service methods
 app.hooks({
   around: {
     all: [logError]
@@ -70,7 +42,6 @@ app.hooks({
   after: {},
   error: {}
 })
-// Register application setup and teardown hooks here
 app.hooks({
   setup: [],
   teardown: []
