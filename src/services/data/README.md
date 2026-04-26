@@ -8,6 +8,23 @@
 POST /data
 ```
 
+### Authentication
+
+All requests require a valid Supabase JWT passed as a Bearer token:
+
+```
+Authorization: Bearer <supabase_access_token>
+```
+
+Obtain the token from the Supabase session after sign-in:
+
+```ts
+const { data: { session } } = await supabase.auth.getSession()
+const token = session?.access_token
+```
+
+Requests without a token or with an expired token receive a `401 Unauthorized` response. The service validates the token locally using `SUPABASE_JWT_SECRET` — set this environment variable before starting.
+
 ### Request formats
 
 #### Multipart file upload
@@ -69,6 +86,7 @@ type EarningInput = ExpenseInput & {
 
 | Scenario                            | HTTP status | Detail                          |
 | ----------------------------------- | :---------: | ------------------------------- |
+| Missing or invalid Bearer token     | 401         | `NotAuthenticated`              |
 | Missing / invalid `dataProvider`    | 400         | Zod validation message          |
 | Missing / invalid `dataType`        | 400         | Zod validation message          |
 | Unsupported provider in converter   | 400         | Converter error message         |
@@ -113,18 +131,19 @@ The server listens on `http://localhost:3030` by default. Override with `PORT` /
 #### Fetch — file upload
 
 ```ts
-async function uploadStatement(file: File, dataProvider = 'CapitalOne') {
+async function uploadStatement(file: File, token: string, dataProvider = 'CapitalOne') {
   const form = new FormData()
   form.append('dataProvider', dataProvider)
   form.append('file', file)
 
   const res = await fetch('http://localhost:3030/data', {
     method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
     body: form
   })
 
   if (!res.ok) throw new Error(await res.text())
-  return res.json() // { isSuccess, convertedLedger, errors }
+  return res.json() // { isSuccess, convertedLedger }
 }
 ```
 
@@ -133,26 +152,9 @@ async function uploadStatement(file: File, dataProvider = 'CapitalOne') {
 #### PowerShell (Windows)
 
 ```powershell
-$filePath = "C:\Users\chris\Downloads\2026-04-10_360PerformanceSavings...5040.csv"
-$fileBytes = [System.IO.File]::ReadAllBytes($filePath)
-$fileName  = [System.IO.Path]::GetFileName($filePath)
-
-$boundary = [System.Guid]::NewGuid().ToString()
-$LF = "`r`n"
-
-$bodyLines = @(
-    "--$boundary",
-    "Content-Disposition: form-data; name=`"dataProvider`"$LF",
-    "CapitalOne",
-    "--$boundary",
-    "Content-Disposition: form-data; name=`"file`"; filename=`"$fileName`"",
-    "Content-Type: text/csv$LF",
-    [System.Text.Encoding]::UTF8.GetString($fileBytes),
-    "--$boundary--$LF"
-) -join $LF
-
 Invoke-RestMethod -Method POST -Uri "http://localhost:3030/data" `
   -ContentType "multipart/form-data; boundary=$boundary" `
+  -Headers @{ Authorization = "Bearer <token>" } `
   -Body $bodyLines
 ```
 
@@ -160,6 +162,7 @@ Invoke-RestMethod -Method POST -Uri "http://localhost:3030/data" `
 
 ```sh
 curl -X POST http://localhost:3030/data \
+  -H "Authorization: Bearer <token>" \
   -F "dataProvider=CapitalOne" \
   -F "file=@/path/to/export.csv"
 ```

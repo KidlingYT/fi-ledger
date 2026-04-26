@@ -3,6 +3,7 @@ import { LedgerInput, Result, validateLedgerInput } from './types'
 import { Application } from '@feathersjs/koa'
 import { BadRequest } from '@feathersjs/errors'
 import { convertLedgerInput } from './convert'
+import { authenticateSupabase } from '../../hooks/authenticate-supabase'
 class DataService {
   ledgerInputs: LedgerInput[] = []
 
@@ -35,6 +36,11 @@ class DataService {
 
 export const data = (app: Application) => {
   app.use('data', new DataService())
+  app.service('data').hooks({
+    before: {
+      create: [authenticateSupabase]
+    }
+  })
 }
 
 // Add this service to the service type index

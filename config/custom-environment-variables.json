@@ -6,5 +6,6 @@
   "host": "HOSTNAME",
   "authentication": {
     "secret": "FEATHERS_SECRET"
-  }
+  },
+  "supabaseJwtSecret": "SUPABASE_JWT_SECRET"
 }
