@@ -1,4 +1,3 @@
-import { keywordObjectId } from '@feathersjs/mongodb'
 // For more information about this file see https://dove.feathersjs.com/guides/cli/validators.html
 import { Ajv, addFormats } from '@feathersjs/schema'
 import type { FormatsPluginOptions } from '@feathersjs/schema'
@@ -28,6 +27,3 @@ export const queryValidator: Ajv = addFormats(
   }),
   formats
 )
-
-dataValidator.addKeyword(keywordObjectId)
-queryValidator.addKeyword(keywordObjectId)
