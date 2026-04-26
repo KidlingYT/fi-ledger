@@ -2,7 +2,7 @@ import { ConvertedLedger, EarningInput, ErrorContext, ExpenseInput, LedgerInput,
 import Papa from 'papaparse'
 
 export function convertLedgerInput(ledgerInput: LedgerInput): {
-  convertedLedger: ConvertedLedger
+  convertedLedger: ConvertedLedger & ErrorContext
 } & Result {
   let isSuccess = true
   let message = ''
@@ -18,7 +18,7 @@ export function convertLedgerInput(ledgerInput: LedgerInput): {
     default:
       isSuccess = false
       message = `Invalid provider: ${dataProvider}`
-      return { convertedLedger: { earnings: [], expenses: [] }, isSuccess, message }
+      return { convertedLedger: { earnings: [], expenses: [], errors: [] }, isSuccess, message }
   }
 
   const convertedLedger = converter.convert(data)
