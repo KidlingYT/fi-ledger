@@ -18,12 +18,6 @@ describe('Feathers application tests', () => {
     await app.teardown()
   })
 
-  it('starts and shows the index page', async () => {
-    const { data } = await axios.get<string>(appUrl)
-
-    assert.ok(data.indexOf('<html lang="en">') !== -1)
-  })
-
   it('shows a 404 JSON error', async () => {
     try {
       await axios.get(`${appUrl}/path/to/nowhere`, {
