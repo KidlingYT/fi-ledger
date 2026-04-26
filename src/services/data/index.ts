@@ -3,22 +3,18 @@ import { LedgerInput, Result, validateLedgerInput } from './types'
 import { Application } from '@feathersjs/koa'
 import { BadRequest } from '@feathersjs/errors'
 import { convertLedgerInput } from './convert'
-
 class DataService {
   ledgerInputs: LedgerInput[] = []
 
-  async create(input: any, params: Params) {
-    const { isSuccess: isValidLedger, message, ledgerInput } = this.parseLedger(input)
-    if (!isValidLedger || !ledgerInput) throw new BadRequest(message, input)
+  async create(input: any, _params: Params) {
+    const { isSuccess: isValidLedger, message: ledgerMessage, ledgerInput } = this.parseLedger(input)
+    if (!isValidLedger || !ledgerInput) throw new BadRequest(ledgerMessage, input)
 
-    const { isSuccess, convertedLedger } = convertLedgerInput(ledgerInput)
+    const { isSuccess, convertedLedger, message } = convertLedgerInput(ledgerInput)
 
-    const userId = input?.user_id
-    if (!userId) {
-      // Continue to parse, return parsed data
-    } else {
-      // Continue to parse, then insert into db
-    }
+    if (!isSuccess) throw new BadRequest(message, input)
+
+    return { convertedLedger, isSuccess }
   }
 
   parseLedger(input: any): {

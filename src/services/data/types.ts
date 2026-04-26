@@ -37,7 +37,7 @@ export function validateEarning(data: unknown): Earning {
 const LedgerInputFileSchema = z.looseObject({
   dataProvider: z.enum(['CapitalOne']),
   dataType: z.literal('File'),
-  data: z.instanceof(File)
+  data: z.string()
 })
 
 const LedgerInputJSONSchema = z.looseObject({
@@ -54,9 +54,15 @@ export function validateLedgerInput(data: unknown): LedgerInput {
   return LedgerInputSchema.parse(data)
 }
 
-export type ConvertedLedger = { earnings: Earning[]; expenses: Expense[] }
+export type ExpenseInput = Omit<Expense, 'id' | 'created_at' | 'user_id'>
+export type EarningInput = Omit<Earning, 'id' | 'created_at' | 'user_id'>
+export type ConvertedLedger = { earnings: EarningInput[]; expenses: ExpenseInput[] }
 
 export interface Result {
   message: string
   isSuccess: boolean
+}
+
+export interface ErrorContext {
+  errors: string[]
 }
