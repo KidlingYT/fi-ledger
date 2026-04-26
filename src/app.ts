@@ -20,30 +20,29 @@ const app: Application = koa(feathers())
 app.configure(configuration(configurationValidator))
 
 // Set up Koa middleware
+app.use(async (ctx, next) => {
+  if (ctx.path === '/health') {
+    ctx.status = 200
+    ctx.body = { status: 'ok' }
+    return
+  }
+  await next()
+})
 app.use(cors())
 app.use(errorHandler())
 app.use(parseAuthentication())
 app.use(async (ctx, next) => {
-  // Middleware: intercept multipart uploads on POST /data
-  // Extracts the CSV file content and merges it into the request body
   if (ctx.method === 'POST' && ctx.path === '/data' && ctx.is('multipart/*')) {
     await upload.single('file')(ctx as any, async () => {})
     const file = (ctx as any).file as multer.File | undefined
     if (file) {
       const csvString = file.buffer.toString('utf-8')
-      // Merge file fields with any other form fields
       ctx.request.body = {
         ...(ctx.request.body as object),
         dataType: 'File',
         data: csvString
       }
     }
-  }
-  // Healthcheck
-  if (ctx.path === '/health') {
-    ctx.status = 200
-    ctx.body = { status: 'ok' }
-    return
   }
   await next()
 })
